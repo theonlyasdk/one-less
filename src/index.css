@@ -226,6 +226,12 @@ code {
 }
 
 [data-slot="breadcrumb"] { margin: 4px 0 8px; }
+[data-slot="breadcrumb-link"],
+[data-slot="breadcrumb-page"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
 
 .view-title { margin: 0 0 4px; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
 .view-title .muted { font-weight: 400; }

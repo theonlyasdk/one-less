@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
+  Calendar01Icon,
+  CalendarDaysIcon,
   Delete02Icon,
+  Home01Icon,
   PencilEdit02Icon,
   PlusSignIcon,
   Settings01Icon,
+  Sun01Icon,
 } from "@hugeicons/core-free-icons";
 import {
   Breadcrumb,
@@ -361,7 +365,7 @@ function LifeView({
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbPage>Life</BreadcrumbPage>
+            <BreadcrumbPage><CrumbIcon icon={Home01Icon} />Life</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -412,11 +416,11 @@ function BlockView({
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink onClick={onBack}>Life</BreadcrumbLink>
+            <BreadcrumbLink onClick={onBack}><CrumbIcon icon={Home01Icon} />Life</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{blockYearLabel(block)} · Block {block.index + 1}</BreadcrumbPage>
+            <BreadcrumbPage><CrumbIcon icon={Calendar01Icon} />{blockYearLabel(block)} · Block {block.index + 1}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -483,15 +487,15 @@ function WeekView({
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink onClick={onSelectLife}>Life</BreadcrumbLink>
+            <BreadcrumbLink onClick={onSelectLife}><CrumbIcon icon={Home01Icon} />Life</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink onClick={onBack}>{crumbMid}</BreadcrumbLink>
+            <BreadcrumbLink onClick={onBack}><CrumbIcon icon={Calendar01Icon} />{crumbMid}</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Week {weekIndex + 1}</BreadcrumbPage>
+            <BreadcrumbPage><CrumbIcon icon={CalendarDaysIcon} />Week {weekIndex + 1}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -572,19 +576,19 @@ function DayView({
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink onClick={onSelectLife}>Life</BreadcrumbLink>
+            <BreadcrumbLink onClick={onSelectLife}><CrumbIcon icon={Home01Icon} />Life</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink onClick={onSelectBlock}>{crumbMid}</BreadcrumbLink>
+            <BreadcrumbLink onClick={onSelectBlock}><CrumbIcon icon={Calendar01Icon} />{crumbMid}</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink onClick={onBack}>Week {weekIndex + 1}</BreadcrumbLink>
+            <BreadcrumbLink onClick={onBack}><CrumbIcon icon={CalendarDaysIcon} />Week {weekIndex + 1}</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{fmtDate(dayStart)}</BreadcrumbPage>
+            <BreadcrumbPage><CrumbIcon icon={Sun01Icon} />{fmtDate(dayStart)}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -709,6 +713,10 @@ function ActivityForm({
 }
 
 /* ---------------- bits ---------------- */
+
+function CrumbIcon({ icon }: { icon: IconSvgElement }) {
+  return <HugeiconsIcon icon={icon} size={13} strokeWidth={2} aria-hidden="true" />;
+}
 
 function Legend({ today = false }: { today?: boolean }) {
   return (
