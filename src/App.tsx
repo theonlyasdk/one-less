@@ -78,7 +78,6 @@ export default function App() {
   const progress = Math.min(1, Math.max(0, (now - settings.birthMs) / totalMs));
 
   const doneBlocks = blocks.filter((b) => b.endMs <= now).length;
-  const currentBlockIdx = blocks.findIndex((b) => b.startMs <= now && now < b.endMs);
 
   function updateSettings(birthMs: number, lifespanYears: number) {
     setSettings({
@@ -141,8 +140,7 @@ export default function App() {
         <div className="progress-top">
           <span className="progress-pct">{(progress * 100).toFixed(4)}%</span>
           <span className="muted small">
-            {doneBlocks} / {blocks.length} blocks ·{" "}
-            {currentBlockIdx >= 0 ? `in block ${currentBlockIdx + 1}` : now < settings.birthMs ? "not born yet" : "complete"}
+            {doneBlocks} / {blocks.length} blocks
           </span>
         </div>
         <div className="progress-track" role="progressbar" aria-valuenow={Number((progress * 100).toFixed(2))} aria-valuemin={0} aria-valuemax={100}>
@@ -158,7 +156,6 @@ export default function App() {
           <LifeView
             blocks={blocks}
             now={now}
-            birthMs={settings.birthMs}
             onOpen={(i) => setRoute({ name: "block", blockIndex: i })}
           />
         )}
@@ -289,12 +286,10 @@ function SettingsCard({
 function LifeView({
   blocks,
   now,
-  birthMs,
   onOpen,
 }: {
   blocks: SixMonthBlock[];
   now: number;
-  birthMs: number;
   onOpen: (i: number) => void;
 }) {
   return (
@@ -320,7 +315,6 @@ function LifeView({
         })}
       </div>
       <Legend />
-      <p className="muted small">Born {fmtDateTime(birthMs)}. Click a block to zoom into its weeks.</p>
     </section>
   );
 }
