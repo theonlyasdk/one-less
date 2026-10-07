@@ -27,6 +27,8 @@ export interface Settings {
   /** Offset minutes east of UTC captured at birth moment (for display fidelity). */
   birthTzOffsetMin: number;
   lifespanYears: number;
+  /** true = 12-hour clock ("2:32 PM"), false = 24-hour ("14:32"). */
+  hour12: boolean;
 }
 
 export function defaultSettings(): Settings {
@@ -36,6 +38,7 @@ export function defaultSettings(): Settings {
     birthMs: birth,
     birthTzOffsetMin: -new Date(birth).getTimezoneOffset(),
     lifespanYears: 80,
+    hour12: true,
   };
 }
 
@@ -53,6 +56,7 @@ export function loadSettings(): Settings {
           ? p.birthTzOffsetMin
           : -new Date(p.birthMs).getTimezoneOffset(),
       lifespanYears: Math.min(150, Math.max(1, Math.floor(lifespan) || 80)),
+      hour12: typeof p.hour12 === "boolean" ? p.hour12 : true,
     };
   } catch {
     return defaultSettings();

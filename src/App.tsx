@@ -42,6 +42,7 @@ import {
   blockRangeLabel,
   blockYearLabel,
   fillFraction,
+  fmtClockTime,
   fmtDate,
   fmtDateTime,
   fmtDayNum,
@@ -107,11 +108,12 @@ export default function App() {
 
   const doneBlocks = blocks.filter((b) => b.endMs <= now).length;
 
-  function updateSettings(birthMs: number, lifespanYears: number) {
+  function updateSettings(birthMs: number, lifespanYears: number, hour12: boolean) {
     setSettings({
       birthMs,
       birthTzOffsetMin: -new Date(birthMs).getTimezoneOffset(),
       lifespanYears,
+      hour12,
     });
     setRoute({ name: "life" });
   }
@@ -142,9 +144,9 @@ export default function App() {
         <div>
           <h1 className="brand">One Less</h1>
           <p className="sub">
-            {fmtDateTime(settings.birthMs)} <span className="muted">({tzLabelAt(settings.birthMs)} at birth)</span>
+            {fmtDateTime(settings.birthMs, settings.hour12)} <span className="muted">({tzLabelAt(settings.birthMs)} at birth)</span>
             {" → "}
-            {fmtDateTime(targetMs)}
+            {fmtDateTime(targetMs, settings.hour12)}
           </p>
         </div>
         <DialogTrigger isOpen={settingsOpen} onOpenChange={setSettingsOpen}>
@@ -196,6 +198,7 @@ export default function App() {
             block={blocks[route.blockIndex]}
             birthMs={settings.birthMs}
             now={now}
+            hour12={settings.hour12}
             onBack={() => setRoute({ name: "life" })}
             onOpenWeek={(w) => setRoute({ name: "week", weekIndex: w, fromBlock: route.blockIndex })}
           />
@@ -207,6 +210,7 @@ export default function App() {
             fromBlock={route.fromBlock}
             blocks={blocks}
             now={now}
+            hour12={settings.hour12}
             activities={activities}
             onBack={() => setRoute({ name: "block", blockIndex: route.fromBlock })}
             onSelectLife={() => setRoute({ name: "life" })}
@@ -222,6 +226,7 @@ export default function App() {
             fromBlock={route.fromBlock}
             blocks={blocks}
             now={now}
+            hour12={settings.hour12}
             activities={activities[route.key] ?? []}
             onBack={() =>
               setRoute({ name: "week", weekIndex: route.weekIndex, fromBlock: route.fromBlock })
@@ -258,11 +263,12 @@ function SettingsForm({
   onClose,
 }: {
   settings: Settings;
-  onSave: (birthMs: number, lifespanYears: number) => void;
+  onSave: (birthMs: number, lifespanYears: number, hour12: boolean) => void;
   onClose: () => void;
 }) {
   const [birthLocal, setBirthLocal] = useState(() => toDateTimeLocal(settings.birthMs));
   const [years, setYears] = useState(() => String(settings.lifespanYears));
+  const [hour12, setHour12] = useState(() => settings.hour12);
   const [error, setError] = useState<string | null>(null);
 
   function handleSave() {
@@ -271,7 +277,7 @@ function SettingsForm({
     if (ms === null) { setError("Enter a valid birth date and time."); return; }
     if (!Number.isFinite(y) || y < 1 || y > 150) { setError("Lifespan must be 1–150 years."); return; }
     setError(null);
-    onSave(ms, y);
+    onSave(ms, y, hour12);
     onClose();
   }
 
@@ -305,9 +311,30 @@ function SettingsForm({
             onChange={(e) => setYears(e.target.value)}
           />
         </Field>
+        <Field>
+          <Label id="clock-label">Clock</Label>
+          <div className="seg" role="group" aria-labelledby="clock-label">
+            <Button
+              variant={hour12 ? "default" : "ghost"}
+              size="sm"
+              aria-pressed={hour12}
+              onClick={() => setHour12(true)}
+            >
+              12-hour
+            </Button>
+            <Button
+              variant={!hour12 ? "default" : "ghost"}
+              size="sm"
+              aria-pressed={!hour12}
+              onClick={() => setHour12(false)}
+            >
+              24-hour
+            </Button>
+          </div>
+        </Field>
       </FieldGroup>
       {previewTarget !== null && (
-        <p className="muted small preview">Target end: {fmtDateTime(previewTarget)} (birth + {years} calendar years)</p>
+        <p className="muted small preview">Target end: {fmtDateTime(previewTarget, hour12)} (birth + {years} calendar years)</p>
       )}
       {error && <p className="error small">{error}</p>}
       <DialogFooter>
@@ -368,12 +395,14 @@ function BlockView({
   block,
   birthMs,
   now,
+  hour12,
   onBack,
   onOpenWeek,
 }: {
   block: SixMonthBlock;
   birthMs: number;
   now: number;
+  hour12: boolean;
   onBack: () => void;
   onOpenWeek: (weekIndex: number) => void;
 }) {
@@ -393,7 +422,7 @@ function BlockView({
       </Breadcrumb>
       <h2 className="view-title">6 months <span className="muted">· {blockRangeLabel(block)}</span></h2>
       <p className="muted small">
-        {weeks.length} continuous weeks overlap this block. Weeks run 7 days from {fmtDateTime(birthMs)} and don’t reset here.
+        {weeks.length} continuous weeks overlap this block. Weeks run 7 days from {fmtDateTime(birthMs, hour12)} and don’t reset here.
       </p>
       <div className="grid week-grid">
         {weeks.map((w) => {
@@ -405,7 +434,7 @@ function BlockView({
               className={`cell cell-week is-${st}`}
               style={st === "present" ? { ["--fill" as string]: `${fill * 100}%` } : undefined}
               onClick={() => onOpenWeek(w.index)}
-              title={`Week ${w.index + 1}: ${fmtDateTime(w.startMs)} → ${fmtDateTime(w.endMs)}`}
+              title={`Week ${w.index + 1}: ${fmtDateTime(w.startMs, hour12)} → ${fmtDateTime(w.endMs, hour12)}`}
               aria-label={`Week ${w.index + 1}, ${st}`}
             >
               <span className="cell-fill" aria-hidden="true" />
@@ -427,6 +456,7 @@ function WeekView({
   fromBlock,
   blocks,
   now,
+  hour12,
   activities,
   onBack,
   onSelectLife,
@@ -437,6 +467,7 @@ function WeekView({
   fromBlock: number;
   blocks: SixMonthBlock[];
   now: number;
+  hour12: boolean;
   activities: ActivityMap;
   onBack: () => void;
   onSelectLife: () => void;
@@ -464,7 +495,7 @@ function WeekView({
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <h2 className="view-title">Week {weekIndex + 1} <span className="muted">· {fmtDateTime(week.startMs)} → {fmtDateTime(week.endMs)}</span></h2>
+      <h2 className="view-title">Week {weekIndex + 1} <span className="muted">· {fmtDateTime(week.startMs, hour12)} → {fmtDateTime(week.endMs, hour12)}</span></h2>
       <p className="muted small">Days use calendar boundaries (00:00 → 23:59) so tracking feels natural.</p>
       <div className="grid day-grid">
         {days.map((d) => {
@@ -503,6 +534,7 @@ function DayView({
   onBack,
   onSelectLife,
   onSelectBlock,
+  hour12,
   onUpsert,
   onDelete,
 }: {
@@ -515,6 +547,7 @@ function DayView({
   onBack: () => void;
   onSelectLife: () => void;
   onSelectBlock: () => void;
+  hour12: boolean;
   onUpsert: (a: Activity) => void;
   onDelete: (id: string) => void;
 }) {
@@ -560,7 +593,7 @@ function DayView({
         <span className="muted">· {st === "present" ? "today" : st}</span>
       </h2>
       <p className="muted small">
-        {fmtDateTime(dayStart)} → {fmtDateTime(dayEnd)} · day key <code>{dayKeyStr}</code>
+        {fmtDateTime(dayStart, hour12)} → {fmtDateTime(dayEnd, hour12)} · day key <code>{dayKeyStr}</code>
       </p>
 
       <ActivityForm
@@ -579,7 +612,7 @@ function DayView({
               <span className="badge">{ACTIVITY_TYPES.find((t) => t.value === a.type)?.label ?? a.type}</span>
             </div>
             <div className="muted small">
-              {[a.time ? `at ${a.time}` : null, a.durationMin ? `${a.durationMin} min` : null].filter(Boolean).join(" · ") || "no time set"}
+              {[a.time ? `at ${fmtClockTime(a.time, hour12)}` : null, a.durationMin ? `${a.durationMin} min` : null].filter(Boolean).join(" · ") || "no time set"}
             </div>
             {a.notes && <p className="notes">{a.notes}</p>}
             <div className="row">

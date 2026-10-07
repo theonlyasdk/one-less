@@ -150,12 +150,34 @@ const dateFmt = new Intl.DateTimeFormat(undefined, {
   year: "numeric",
 });
 
-const dateTimeFmt = new Intl.DateTimeFormat(undefined, {
+const dateTime12 = new Intl.DateTimeFormat(undefined, {
   day: "numeric",
   month: "short",
   year: "numeric",
   hour: "2-digit",
   minute: "2-digit",
+  hour12: true,
+});
+
+const dateTime24 = new Intl.DateTimeFormat(undefined, {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
+
+const clock12 = new Intl.DateTimeFormat(undefined, {
+  hour: "numeric",
+  minute: "2-digit",
+  hour12: true,
+});
+
+const clock24 = new Intl.DateTimeFormat(undefined, {
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
 });
 
 const shortYearFmt = new Intl.DateTimeFormat(undefined, { year: "numeric" });
@@ -166,8 +188,16 @@ export function fmtDate(ms: number): string {
   return dateFmt.format(new Date(ms));
 }
 
-export function fmtDateTime(ms: number): string {
-  return dateTimeFmt.format(new Date(ms));
+export function fmtDateTime(ms: number, hour12 = true): string {
+  return (hour12 ? dateTime12 : dateTime24).format(new Date(ms));
+}
+
+/** Format an "HH:MM" activity time per the clock setting ("14:32" -> "2:32 PM" / "14:32"). */
+export function fmtClockTime(hhmm: string, hour12: boolean): string {
+  const m = /^(\d{1,2}):(\d{2})/.exec(hhmm);
+  if (!m) return hhmm;
+  const d = new Date(2000, 0, 1, Number(m[1]), Number(m[2]));
+  return (hour12 ? clock12 : clock24).format(d);
 }
 
 export function fmtYear(ms: number): string {
