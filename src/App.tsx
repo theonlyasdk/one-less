@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ArrowLeft01Icon,
   Delete02Icon,
   PencilEdit02Icon,
   PlusSignIcon,
@@ -186,6 +185,7 @@ export default function App() {
             now={now}
             activities={activities}
             onBack={() => setRoute({ name: "block", blockIndex: route.fromBlock })}
+            onSelectLife={() => setRoute({ name: "life" })}
             onOpenDay={(key) =>
               setRoute({ name: "day", key, weekIndex: route.weekIndex, fromBlock: route.fromBlock })
             }
@@ -202,6 +202,8 @@ export default function App() {
             onBack={() =>
               setRoute({ name: "week", weekIndex: route.weekIndex, fromBlock: route.fromBlock })
             }
+            onSelectLife={() => setRoute({ name: "life" })}
+            onSelectBlock={() => setRoute({ name: "block", blockIndex: route.fromBlock })}
             onUpsert={(a) => upsertActivity(route.key, a)}
             onDelete={(id) => deleteActivity(route.key, id)}
           />
@@ -303,7 +305,7 @@ function LifeView({
 }) {
   return (
     <section aria-label="Lifetime view">
-      <Crumb trail={["Life"]} />
+      <Crumb trail={[{ label: "Life" }]} />
       <h2 className="view-title">Life <span className="muted">· {blocks.length} × 6 months</span></h2>
       <div className="grid life-grid">
         {blocks.map((b) => {
@@ -346,7 +348,7 @@ function BlockView({
   const weeks = useMemo(() => getWeeksForBlock(birthMs, block), [birthMs, block]);
   return (
     <section aria-label="Six month view">
-      <Crumb trail={["Life", `${blockYearLabel(block)} · Block ${block.index + 1}`]} onBack={onBack} />
+      <Crumb trail={[{ label: "Life", onSelect: onBack }, { label: `${blockYearLabel(block)} · Block ${block.index + 1}` }]} />
       <h2 className="view-title">6 months <span className="muted">· {blockRangeLabel(block)}</span></h2>
       <p className="muted small">
         {weeks.length} continuous weeks overlap this block. Weeks run 7 days from {fmtDateTime(birthMs)} and don’t reset here.
@@ -385,6 +387,7 @@ function WeekView({
   now,
   activities,
   onBack,
+  onSelectLife,
   onOpenDay,
 }: {
   birthMs: number;
@@ -394,6 +397,7 @@ function WeekView({
   now: number;
   activities: ActivityMap;
   onBack: () => void;
+  onSelectLife: () => void;
   onOpenDay: (key: string) => void;
 }) {
   const week = getWeekInterval(birthMs, weekIndex);
@@ -403,7 +407,7 @@ function WeekView({
 
   return (
     <section aria-label="Week view">
-      <Crumb trail={["Life", crumbMid, `Week ${weekIndex + 1}`]} onBack={onBack} />
+      <Crumb trail={[{ label: "Life", onSelect: onSelectLife }, { label: crumbMid, onSelect: onBack }, { label: `Week ${weekIndex + 1}` }]} />
       <h2 className="view-title">Week {weekIndex + 1} <span className="muted">· {fmtDateTime(week.startMs)} → {fmtDateTime(week.endMs)}</span></h2>
       <p className="muted small">Days use calendar boundaries (00:00 → 23:59) so tracking feels natural.</p>
       <div className="grid day-grid">
@@ -441,6 +445,8 @@ function DayView({
   now,
   activities,
   onBack,
+  onSelectLife,
+  onSelectBlock,
   onUpsert,
   onDelete,
 }: {
@@ -451,6 +457,8 @@ function DayView({
   now: number;
   activities: Activity[];
   onBack: () => void;
+  onSelectLife: () => void;
+  onSelectBlock: () => void;
   onUpsert: (a: Activity) => void;
   onDelete: (id: string) => void;
 }) {
@@ -472,7 +480,7 @@ function DayView({
 
   return (
     <section aria-label="Day view">
-      <Crumb trail={["Life", crumbMid, `Week ${weekIndex + 1}`, fmtDate(dayStart)]} onBack={onBack} />
+      <Crumb trail={[{ label: "Life", onSelect: onSelectLife }, { label: crumbMid, onSelect: onSelectBlock }, { label: `Week ${weekIndex + 1}`, onSelect: onBack }, { label: fmtDate(dayStart) }]} />
       <h2 className="view-title">
         {fmtWeekday(dayStart)}, {fmtDate(dayStart)}{" "}
         <span className="muted">· {st === "present" ? "today" : st}</span>
@@ -595,24 +603,28 @@ function ActivityForm({
 
 /* ---------------- bits ---------------- */
 
-function Crumb({ trail, onBack }: { trail: string[]; onBack?: () => void }) {
+function Crumb({ trail }: { trail: { label: string; onSelect?: () => void }[] }) {
   return (
     <nav className="crumb muted small" aria-label="Breadcrumb">
-      {onBack ? (
-        <button className="btn btn-ghost back" onClick={onBack} aria-label="Go back">
-          <HugeiconsIcon icon={ArrowLeft01Icon} size={15} strokeWidth={2} />
-        </button>
-      ) : (
-        <span className="back back-disabled" aria-hidden="true">
-          <HugeiconsIcon icon={ArrowLeft01Icon} size={15} strokeWidth={2} />
-        </span>
-      )}
-      {trail.map((t, i) => (
-        <span key={i}>
-          {i > 0 && <span className="sep"> / </span>}
-          <span className={i === trail.length - 1 ? "crumb-current" : undefined}>{t}</span>
-        </span>
-      ))}
+      <ol className="crumb-list">
+        {trail.map((t, i) => {
+          const isLast = i === trail.length - 1;
+          return (
+            <li key={i} className="crumb-item">
+              {i > 0 && <span className="sep" aria-hidden="true">/</span>}
+              {t.onSelect && !isLast ? (
+                <button className="crumb-link" onClick={t.onSelect}>
+                  {t.label}
+                </button>
+              ) : (
+                <span className={isLast ? "crumb-current" : undefined} aria-current={isLast ? "page" : undefined}>
+                  {t.label}
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ol>
     </nav>
   );
 }

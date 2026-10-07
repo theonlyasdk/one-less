@@ -138,8 +138,6 @@ code {
 .btn-ghost { border-color: transparent; color: var(--muted); }
 .btn-ghost:hover { color: var(--foreground); background: var(--muted-bg); }
 .btn.danger { color: #dc2626; }
-.back { font-size: 15px; padding: 2px 8px; margin-right: 6px; }
-.back-disabled { margin-right: 6px; opacity: 0.4; }
 
 .settings { display: flex; flex-direction: column; gap: 10px; }
 .field-row { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -171,9 +169,31 @@ code {
   .progress-fill { transition: none; }
 }
 
-.crumb { display: flex; align-items: center; margin: 4px 0 8px; }
+.crumb { margin: 4px 0 8px; }
+.crumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.crumb-item { display: inline-flex; align-items: center; gap: 6px; }
+.crumb-link {
+  font: inherit;
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.crumb-link:hover { color: var(--foreground); background: var(--muted-bg); }
+.crumb-link:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
 .crumb-current { color: var(--foreground); font-weight: 550; }
-.sep { margin: 0 2px; }
+.sep { color: var(--muted); opacity: 0.6; }
 
 .view-title { margin: 0 0 4px; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
 .view-title .muted { font-weight: 400; }
