@@ -1,4 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  ArrowLeft01Icon,
+  Delete02Icon,
+  PencilEdit02Icon,
+  PlusSignIcon,
+  Settings01Icon,
+} from "@hugeicons/core-free-icons";
 import {
   ACTIVITY_TYPES,
   loadActivities,
@@ -124,6 +132,7 @@ export default function App() {
           onClick={() => setSettingsOpen((v) => !v)}
           aria-expanded={settingsOpen}
         >
+          <HugeiconsIcon icon={Settings01Icon} size={15} strokeWidth={2} />
           {settingsOpen ? "Close" : "Settings"}
         </button>
       </header>
@@ -492,8 +501,14 @@ function DayView({
             </div>
             {a.notes && <p className="notes">{a.notes}</p>}
             <div className="row">
-              <button className="btn btn-ghost" onClick={() => setEditingId(a.id)}>Edit</button>
-              <button className="btn btn-ghost danger" onClick={() => onDelete(a.id)}>Delete</button>
+              <button className="btn btn-ghost" onClick={() => setEditingId(a.id)}>
+                <HugeiconsIcon icon={PencilEdit02Icon} size={14} strokeWidth={2} />
+                Edit
+              </button>
+              <button className="btn btn-ghost danger" onClick={() => onDelete(a.id)}>
+                <HugeiconsIcon icon={Delete02Icon} size={14} strokeWidth={2} />
+                Delete
+              </button>
             </div>
           </article>
         ))}
@@ -568,7 +583,10 @@ function ActivityForm({
       </label>
       {error && <p className="error small">{error}</p>}
       <div className="row">
-        <button className="btn btn-primary" onClick={handleSave}>{initial ? "Save changes" : "Add"}</button>
+        <button className="btn btn-primary" onClick={handleSave}>
+          {!initial && <HugeiconsIcon icon={PlusSignIcon} size={15} strokeWidth={2.5} />}
+          {initial ? "Save changes" : "Add"}
+        </button>
         {initial && <button className="btn" onClick={onCancel}>Cancel</button>}
       </div>
     </div>
@@ -581,9 +599,13 @@ function Crumb({ trail, onBack }: { trail: string[]; onBack?: () => void }) {
   return (
     <nav className="crumb muted small" aria-label="Breadcrumb">
       {onBack ? (
-        <button className="btn btn-ghost back" onClick={onBack} aria-label="Go back">←</button>
+        <button className="btn btn-ghost back" onClick={onBack} aria-label="Go back">
+          <HugeiconsIcon icon={ArrowLeft01Icon} size={15} strokeWidth={2} />
+        </button>
       ) : (
-        <span className="back back-disabled" aria-hidden="true">←</span>
+        <span className="back back-disabled" aria-hidden="true">
+          <HugeiconsIcon icon={ArrowLeft01Icon} size={15} strokeWidth={2} />
+        </span>
       )}
       {trail.map((t, i) => (
         <span key={i}>
