@@ -39,5 +39,7 @@ Settings (birth date/time, target lifespan 1–150y) and activities persist in `
 
 ## Stack
 
-React + TypeScript + Vite. Minimal shadcn/ui-inspired styling, no navbar —
-the graph itself is the navigation.
+React + TypeScript + Vite. shadcn/ui components (React Aria based: button,
+breadcrumb, dialog, field, input, label) styled with Tailwind CSS v4,
+Inter/Instrument Sans self-hosted via Fontsource, Hugeicons for icons.
+Minimalist by design, no navbar — the graph itself is the navigation.

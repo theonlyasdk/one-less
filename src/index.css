@@ -1,3 +1,7 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #09090b;
@@ -9,11 +13,43 @@
   --primary-fg: #fafafa;
   --accent: #18181b;
   --ring: #18181b;
+  --destructive: #dc2626;
   --radius: 10px;
   --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --display: "Instrument Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   color-scheme: light;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  --color-popover: var(--card);
+  --color-popover-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-fg);
+  --color-secondary: var(--muted-bg);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--muted-bg);
+  --color-muted-foreground: var(--muted);
+  --color-accent: var(--muted-bg);
+  --color-accent-foreground: var(--foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--ring);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -139,7 +175,14 @@ code {
 .btn-ghost:hover { color: var(--foreground); background: var(--muted-bg); }
 .btn.danger { color: #dc2626; }
 
-.settings { display: flex; flex-direction: column; gap: 10px; }
+/* shadcn dialog (react-aria) enter/exit transitions */
+[data-slot="dialog-overlay"][data-entering] { animation: fade-in 0.18s ease; }
+[data-slot="dialog-panel"][data-entering] { animation: zoom-in 0.2s ease; }
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.preview { margin: 12px 0 0; }
 .field-row { display: flex; gap: 12px; flex-wrap: wrap; }
 .field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; flex: 1; min-width: 200px; }
 .field > span { color: var(--muted); }
@@ -166,34 +209,12 @@ code {
 }
 @media (prefers-reduced-motion: reduce) {
   .view { animation: none; }
+  [data-slot="dialog-overlay"][data-entering] { animation: none; }
+  [data-slot="dialog-panel"][data-entering] { animation: none; }
   .progress-fill { transition: none; }
 }
 
-.crumb { margin: 4px 0 8px; }
-.crumb-list {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.crumb-item { display: inline-flex; align-items: center; gap: 6px; }
-.crumb-link {
-  font: inherit;
-  background: none;
-  border: none;
-  padding: 2px 4px;
-  margin: -2px -4px;
-  border-radius: 6px;
-  color: var(--muted);
-  cursor: pointer;
-}
-.crumb-link:hover { color: var(--foreground); background: var(--muted-bg); }
-.crumb-link:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
-.crumb-current { color: var(--foreground); font-weight: 550; }
-.sep { color: var(--muted); opacity: 0.6; }
+[data-slot="breadcrumb"] { margin: 4px 0 8px; }
 
 .view-title { margin: 0 0 4px; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
 .view-title .muted { font-weight: 400; }

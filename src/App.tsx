@@ -7,6 +7,27 @@ import {
   Settings01Icon,
 } from "@hugeicons/core-free-icons";
 import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
   ACTIVITY_TYPES,
   loadActivities,
   loadSettings,
@@ -126,23 +147,26 @@ export default function App() {
             {fmtDateTime(targetMs)}
           </p>
         </div>
-        <button
-          className="btn btn-ghost"
-          onClick={() => setSettingsOpen((v) => !v)}
-          aria-expanded={settingsOpen}
-        >
-          <HugeiconsIcon icon={Settings01Icon} size={15} strokeWidth={2} />
-          {settingsOpen ? "Close" : "Settings"}
-        </button>
+        <DialogTrigger isOpen={settingsOpen} onOpenChange={setSettingsOpen}>
+          <Button variant="ghost" aria-label="Open settings">
+            <HugeiconsIcon icon={Settings01Icon} size={15} strokeWidth={2} />
+            Settings
+          </Button>
+          <Dialog className="sm:max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Settings</DialogTitle>
+              <DialogDescription>
+                Set your birth date and target lifespan. Saving recalculates the whole visualization.
+              </DialogDescription>
+            </DialogHeader>
+            <SettingsForm
+              settings={settings}
+              onSave={updateSettings}
+              onClose={() => setSettingsOpen(false)}
+            />
+          </Dialog>
+        </DialogTrigger>
       </header>
-
-      {settingsOpen && (
-        <SettingsCard
-          settings={settings}
-          onSave={updateSettings}
-          onClose={() => setSettingsOpen(false)}
-        />
-      )}
 
       <section className="progress-card card">
         <div className="progress-top">
@@ -228,7 +252,7 @@ function routeKey(r: Route): string {
 
 /* ---------------- Settings ---------------- */
 
-function SettingsCard({
+function SettingsForm({
   settings,
   onSave,
   onClose,
@@ -259,36 +283,38 @@ function SettingsCard({
   })();
 
   return (
-    <section className="card settings">
-      <div className="field-row">
-        <label className="field">
-          <span>Birth date &amp; time</span>
-          <input
+    <>
+      <FieldGroup>
+        <Field>
+          <Label htmlFor="birth">Birth date &amp; time</Label>
+          <Input
+            id="birth"
             type="datetime-local"
             value={birthLocal}
             onChange={(e) => setBirthLocal(e.target.value)}
           />
-        </label>
-        <label className="field">
-          <span>Target lifespan (years)</span>
-          <input
+        </Field>
+        <Field>
+          <Label htmlFor="lifespan">Target lifespan (years)</Label>
+          <Input
+            id="lifespan"
             type="number"
             min={1}
             max={150}
             value={years}
             onChange={(e) => setYears(e.target.value)}
           />
-        </label>
-      </div>
+        </Field>
+      </FieldGroup>
       {previewTarget !== null && (
-        <p className="muted small">Target end: {fmtDateTime(previewTarget)} (birth + {years} calendar years)</p>
+        <p className="muted small preview">Target end: {fmtDateTime(previewTarget)} (birth + {years} calendar years)</p>
       )}
       {error && <p className="error small">{error}</p>}
-      <div className="row">
-        <button className="btn btn-primary" onClick={handleSave}>Save</button>
-        <button className="btn" onClick={onClose}>Cancel</button>
-      </div>
-    </section>
+      <DialogFooter>
+        <DialogClose>Cancel</DialogClose>
+        <Button onClick={handleSave}>Save changes</Button>
+      </DialogFooter>
+    </>
   );
 }
 
@@ -305,7 +331,13 @@ function LifeView({
 }) {
   return (
     <section aria-label="Lifetime view">
-      <Crumb trail={[{ label: "Life" }]} />
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbPage>Life</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <h2 className="view-title">Life <span className="muted">· {blocks.length} × 6 months</span></h2>
       <div className="grid life-grid">
         {blocks.map((b) => {
@@ -348,7 +380,17 @@ function BlockView({
   const weeks = useMemo(() => getWeeksForBlock(birthMs, block), [birthMs, block]);
   return (
     <section aria-label="Six month view">
-      <Crumb trail={[{ label: "Life", onSelect: onBack }, { label: `${blockYearLabel(block)} · Block ${block.index + 1}` }]} />
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink onClick={onBack}>Life</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{blockYearLabel(block)} · Block {block.index + 1}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <h2 className="view-title">6 months <span className="muted">· {blockRangeLabel(block)}</span></h2>
       <p className="muted small">
         {weeks.length} continuous weeks overlap this block. Weeks run 7 days from {fmtDateTime(birthMs)} and don’t reset here.
@@ -407,7 +449,21 @@ function WeekView({
 
   return (
     <section aria-label="Week view">
-      <Crumb trail={[{ label: "Life", onSelect: onSelectLife }, { label: crumbMid, onSelect: onBack }, { label: `Week ${weekIndex + 1}` }]} />
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink onClick={onSelectLife}>Life</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink onClick={onBack}>{crumbMid}</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Week {weekIndex + 1}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <h2 className="view-title">Week {weekIndex + 1} <span className="muted">· {fmtDateTime(week.startMs)} → {fmtDateTime(week.endMs)}</span></h2>
       <p className="muted small">Days use calendar boundaries (00:00 → 23:59) so tracking feels natural.</p>
       <div className="grid day-grid">
@@ -480,7 +536,25 @@ function DayView({
 
   return (
     <section aria-label="Day view">
-      <Crumb trail={[{ label: "Life", onSelect: onSelectLife }, { label: crumbMid, onSelect: onSelectBlock }, { label: `Week ${weekIndex + 1}`, onSelect: onBack }, { label: fmtDate(dayStart) }]} />
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink onClick={onSelectLife}>Life</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink onClick={onSelectBlock}>{crumbMid}</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink onClick={onBack}>Week {weekIndex + 1}</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{fmtDate(dayStart)}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <h2 className="view-title">
         {fmtWeekday(dayStart)}, {fmtDate(dayStart)}{" "}
         <span className="muted">· {st === "present" ? "today" : st}</span>
@@ -602,32 +676,6 @@ function ActivityForm({
 }
 
 /* ---------------- bits ---------------- */
-
-function Crumb({ trail }: { trail: { label: string; onSelect?: () => void }[] }) {
-  return (
-    <nav className="crumb muted small" aria-label="Breadcrumb">
-      <ol className="crumb-list">
-        {trail.map((t, i) => {
-          const isLast = i === trail.length - 1;
-          return (
-            <li key={i} className="crumb-item">
-              {i > 0 && <span className="sep" aria-hidden="true">/</span>}
-              {t.onSelect && !isLast ? (
-                <button className="crumb-link" onClick={t.onSelect}>
-                  {t.label}
-                </button>
-              ) : (
-                <span className={isLast ? "crumb-current" : undefined} aria-current={isLast ? "page" : undefined}>
-                  {t.label}
-                </span>
-              )}
-            </li>
-          );
-        })}
-      </ol>
-    </nav>
-  );
-}
 
 function Legend({ today = false }: { today?: boolean }) {
   return (
