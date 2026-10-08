@@ -1,331 +1,443 @@
 @import "tailwindcss";
 
+/*
+  Dark mode is class-driven so the theme toggle can override the system
+  preference. `useTheme` puts `.dark` on <html>; until it runs the media query
+  below gives the correct first paint either way.
+*/
 @custom-variant dark (&:is(.dark *));
 
+/*
+  One Less — shadcn/ui (nova, neutral) tokens.
+  Fonts are the project's own: Inter for UI, Instrument Sans for display
+  numerals, DM Sans for the stat figures and section headings.
+*/
+
 :root {
-  --background: #ffffff;
-  --foreground: #09090b;
-  --muted: #71717a;
-  --muted-bg: #f4f4f5;
-  --border: #e4e4e7;
-  --card: #ffffff;
-  --primary: #18181b;
-  --primary-fg: #fafafa;
-  --accent: #18181b;
-  --ring: #18181b;
-  --destructive: #dc2626;
-  --radius: 10px;
-  --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --display: "Instrument Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --radius: 0.625rem;
+
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.1448 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.1448 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.1448 0 0);
+  --primary: oklch(0.2046 0 0);
+  --primary-foreground: oklch(0.9851 0 0);
+  --secondary: oklch(0.9702 0 0);
+  --secondary-foreground: oklch(0.2046 0 0);
+  --muted: oklch(0.9702 0 0);
+  --muted-foreground: oklch(0.5555 0 0);
+  --accent: oklch(0.9702 0 0);
+  --accent-foreground: oklch(0.2046 0 0);
+  --destructive: oklch(0.5771 0.2455 27.3253);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+
+  /* Life graph: past / present / remaining. Fills are chosen so cell labels
+     keep at least 4.5:1 contrast in both schemes. */
+  --graph-future: oklch(0.922 0 0);
+  --graph-past: oklch(0.404 0.008 260);
+  --graph-present: oklch(0.48 0.17 255);
+  --graph-present-foreground: oklch(0.9851 0 0);
+  --graph-today: oklch(0.5771 0.2455 27.3253);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Instrument Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-stats: "DM Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+  }
+
+  :root:not(.light):not(.dark) {
+    --background: oklch(0.1448 0 0);
+    --foreground: oklch(0.9851 0 0);
+    --card: oklch(0.2046 0 0);
+    --card-foreground: oklch(0.9851 0 0);
+    --popover: oklch(0.2046 0 0);
+    --popover-foreground: oklch(0.9851 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.2046 0 0);
+    --secondary: oklch(0.2699 0 0);
+    --secondary-foreground: oklch(0.9851 0 0);
+    --muted: oklch(0.2699 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.2699 0 0);
+    --accent-foreground: oklch(0.9851 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 12%);
+    --input: oklch(1 0 0 / 18%);
+    --ring: oklch(0.556 0 0);
+
+    --graph-future: oklch(0.3021 0.006 260);
+    --graph-past: oklch(0.72 0.008 260);
+    --graph-present: oklch(0.48 0.17 255);
+    --graph-present-foreground: oklch(0.9851 0 0);
+    --graph-today: oklch(0.704 0.191 22.216);
+  }
+}
+
+/* Explicit choice, from the theme toggle or the stored preference. */
+.dark {
+  color-scheme: dark;
+
+  --background: oklch(0.1448 0 0);
+  --foreground: oklch(0.9851 0 0);
+  --card: oklch(0.2046 0 0);
+  --card-foreground: oklch(0.9851 0 0);
+  --popover: oklch(0.2046 0 0);
+  --popover-foreground: oklch(0.9851 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.2046 0 0);
+  --secondary: oklch(0.2699 0 0);
+  --secondary-foreground: oklch(0.9851 0 0);
+  --muted: oklch(0.2699 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.2699 0 0);
+  --accent-foreground: oklch(0.9851 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 18%);
+  --ring: oklch(0.556 0 0);
+
+  --graph-future: oklch(0.3021 0.006 260);
+  --graph-past: oklch(0.72 0.008 260);
+  --graph-present: oklch(0.48 0.17 255);
+  --graph-present-foreground: oklch(0.9851 0 0);
+  --graph-today: oklch(0.704 0.191 22.216);
+}
+
+.light {
   color-scheme: light;
 }
 
 @theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-graph-future: var(--graph-future);
+  --color-graph-past: var(--graph-past);
+  --color-graph-present: var(--graph-present);
+  --color-graph-present-foreground: var(--graph-present-foreground);
+  --color-graph-today: var(--graph-today);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--foreground);
-  --color-popover: var(--card);
-  --color-popover-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-fg);
-  --color-secondary: var(--muted-bg);
-  --color-secondary-foreground: var(--foreground);
-  --color-muted: var(--muted-bg);
-  --color-muted-foreground: var(--muted);
-  --color-accent: var(--muted-bg);
-  --color-accent-foreground: var(--foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--border);
-  --color-ring: var(--ring);
+
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-stats: var(--font-stats);
 }
 
 @layer base {
   * {
     border-color: var(--border);
   }
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #09090b;
-    --foreground: #fafafa;
-    --muted: #a1a1aa;
-    --muted-bg: #27272a;
-    --border: #27272a;
-    --card: #101013;
-    --primary: #fafafa;
-    --primary-fg: #09090b;
-    --ring: #fafafa;
-    color-scheme: dark;
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 }
 
-* { box-sizing: border-box; }
+/*
+  Interaction states.
 
-body {
-  margin: 0;
-  font-family: var(--sans);
-  background: var(--background);
-  color: var(--foreground);
-  -webkit-font-smoothing: antialiased;
-  line-height: 1.5;
-}
+  Every clickable dims to 70% brightness while held. Hover is deliberately
+  subtle so a dense grid of 160 cells does not flicker. This class only owns
+  `filter`: components that already set a transform keep theirs, and any press
+  scale is applied separately with `active:scale-*`.
+*/
+@layer components {
+  .pressable {
+    transition:
+      filter 140ms ease-out,
+      background-color 140ms ease-out,
+      border-color 140ms ease-out,
+      color 140ms ease-out;
+  }
 
-#root {
-  max-width: 880px;
-  margin: 0 auto;
-  padding: 32px 20px 64px;
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-}
+  @media (prefers-reduced-motion: no-preference) {
+    .pressable:hover {
+      filter: brightness(1.07);
+    }
 
-.page { display: flex; flex-direction: column; gap: 16px; margin: auto; width: 100%; }
-
-.masthead {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.brand {
-  margin: 0;
-  font-family: var(--display);
-  font-size: clamp(72px, 16vw, 168px);
-  font-weight: 600;
-  letter-spacing: -0.045em;
-  line-height: 0.95;
+    .pressable:active {
+      filter: brightness(0.7);
+    }
+  }
 }
 
-.sub { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
-
-.muted { color: var(--muted); }
-.small { font-size: 13px; }
-code {
-  font-family: var(--mono);
-  font-size: 12px;
-  background: var(--muted-bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 1px 5px;
+/*
+  The lifetime rail fills from zero on mount, then tracks progress. The
+  drill-down morph itself is driven by the Web Animations API in
+  `useViewMorph`, so it needs no keyframes here — only the origin its
+  translate+scale maths assumes.
+*/
+.view-morph {
+  transform-origin: 0 0;
 }
 
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+@media (prefers-reduced-motion: no-preference) {
+  .rail-fill {
+    transition: width 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .rail-track {
+    animation: rail-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
 }
 
-.progress-card { display: flex; flex-direction: column; gap: 8px; }
-.progress-card p { margin: 0; }
-.progress-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-}
-.progress-pct {
-  font-size: 28px;
-  font-weight: 650;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-}
-.progress-track {
-  height: 8px;
-  border-radius: 999px;
-  background: var(--muted-bg);
-  border: 1px solid var(--border);
-  overflow: hidden;
-}
-.progress-fill {
-  height: 100%;
-  background: var(--primary);
-  border-radius: 999px;
-  transition: width 0.4s ease;
+@keyframes rail-in {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 
-.btn {
-  font: inherit;
-  font-size: 13px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--foreground);
-  border-radius: 8px;
-  padding: 7px 12px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.btn svg { flex: none; }
-.btn:hover { background: var(--muted-bg); }
-.btn-primary { background: var(--primary); color: var(--primary-fg); border-color: var(--primary); }
-.btn-primary:hover { opacity: 0.9; background: var(--primary); }
-.btn-ghost { border-color: transparent; color: var(--muted); }
-.btn-ghost:hover { color: var(--foreground); background: var(--muted-bg); }
-.btn.danger { color: #dc2626; }
-
-/* shadcn dialog (react-aria) enter/exit transitions */
-[data-slot="dialog-overlay"][data-entering] { animation: fade-in 0.18s ease; }
-[data-slot="dialog-panel"][data-entering] { animation: zoom-in 0.2s ease; }
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-.preview { margin: 12px 0 0; }
-
-/* Segmented clock toggle: two buttons joined as one control */
-.seg {
-  display: inline-flex;
-  align-self: flex-start;
-  gap: 2px;
-  padding: 3px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--card);
-}
-.field-row { display: flex; gap: 12px; flex-wrap: wrap; }
-.field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; flex: 1; min-width: 200px; }
-.field > span { color: var(--muted); }
-.field input, .field select, .field textarea {
-  font: inherit;
-  font-size: 14px;
-  color: var(--foreground);
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 10px;
-}
-.field input:focus, .field select:focus, .field textarea:focus {
-  outline: 2px solid var(--ring);
-  outline-offset: 1px;
-}
-.row { display: flex; gap: 8px; }
-.error { color: #dc2626; margin: 0; }
-
-.view { animation: zoom-in 0.22s ease; }
-@keyframes zoom-in {
-  from { opacity: 0; transform: scale(0.985) translateY(4px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .view { animation: none; }
-  [data-slot="dialog-overlay"][data-entering] { animation: none; }
-  [data-slot="dialog-panel"][data-entering] { animation: none; }
-  .progress-fill { transition: none; }
+/*
+  Stagger for the graph. Each cell reads its own index from `--stagger-i` and
+  the grid sets the per-cell step, so a 160-cell life view cascades faster than
+  a 27-cell block view while both finish together.
+*/
+@media (prefers-reduced-motion: no-preference) {
+  .stagger {
+    animation: cell-in 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--stagger-i, 0) * var(--stagger-step, 4ms));
+  }
 }
 
-[data-slot="breadcrumb"] { margin: 4px 0 8px; }
-[data-slot="breadcrumb-link"],
-[data-slot="breadcrumb-page"] {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+@keyframes cell-in {
+  from {
+    opacity: 0;
+    transform: scale(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-.view-title { margin: 0 0 4px; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
-.view-title .muted { font-weight: 400; }
+/*
+  Breadcrumb.
 
-.grid { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; }
-.life-grid { gap: 5px; }
+  FIFO: only the most recent segment slides. Ancestors are unkeyed by route and
+  carry no animation, so when a path deepens React reuses their existing DOM
+  nodes by label and they simply hold still while the one new final segment
+  slides in from the right. Zooming back out retires that same final segment.
+*/
+@media (prefers-reduced-motion: no-preference) {
+  .crumb {
+    animation: crumb-in 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
 
-.cell {
+  .crumb[data-exiting="true"] {
+    animation: crumb-out 170ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+}
+
+@keyframes crumb-in {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes crumb-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+}
+
+/*
+  The "now" marker: a bright arc tracing around the block, week or day you are
+  currently inside. Every level of the graph uses it, so it is what says
+  "you are here" rather than the fill alone.
+
+  Two angles drive a conic gradient clipped to a ring mask, which keeps the
+  corner radius correct on non-square cells:
+    --now-arc    how much of the perimeter is lit
+    --now-angle  where the lit run starts
+
+  Both are registered so they can actually interpolate. On appearance the trace
+  draws itself from nothing to a closed ring with an ease-in-out curve while its
+  starting point travels the whole way round, then settles into a steady comet.
+  The intro ends exactly where the loop begins (full ring, angle 0) so the
+  hand-off is seamless.
+*/
+@property --now-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@property --now-arc {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 90deg;
+}
+
+.now-trace {
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--now-angle),
+    var(--graph-today) 0deg,
+    var(--graph-today) var(--now-arc),
+    transparent var(--now-arc)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+/* Legend key for the marker; not animated and not absolutely positioned. */
+.now-swatch {
   position: relative;
-  border: 1px solid var(--border);
-  background: var(--card);
-  border-radius: 6px;
-  cursor: pointer;
-  padding: 0;
-  overflow: hidden;
-}
-.cell:hover { border-color: var(--muted); }
-.cell:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-
-.cell-life { width: 36px; height: 36px; }
-.cell-week { width: 60px; height: 60px; }
-.cell-day {
-  width: 104px;
-  height: 104px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 8px 4px;
-}
-
-.cell .cell-fill { position: absolute; inset: 0; background: var(--primary); opacity: 0; }
-.cell.is-past .cell-fill { opacity: 1; }
-.cell.is-past { background: var(--primary); border-color: var(--primary); }
-.cell.is-future { background: transparent; }
-.cell.is-present { border-color: var(--primary); border-width: 2px; }
-.cell.is-present .cell-fill { opacity: 1; width: var(--fill, 50%); }
-
-.cell-week .cell-label {
-  position: relative;
-  font-size: 11px;
-  font-family: var(--mono);
-  color: var(--muted);
-}
-.cell-week.is-past .cell-label { color: var(--primary-fg); }
-.cell-week.is-present .cell-label { color: var(--foreground); font-weight: 700; }
-
-.day-name { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
-.day-num { font-size: 14px; font-weight: 600; }
-.cell-day.is-past { background: var(--muted-bg); border-color: var(--border); }
-.cell-day.is-past .day-num { color: var(--muted); }
-.cell-day.is-present { border-color: var(--primary); border-width: 2px; }
-.cell-day .dot {
-  font-size: 10px;
-  font-family: var(--mono);
-  background: var(--primary);
-  color: var(--primary-fg);
-  border-radius: 999px;
-  min-width: 18px;
-  height: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 5px;
-}
-
-.legend { display: flex; gap: 14px; margin: 6px 0; }
-.legend .sw {
-  display: inline-block;
-  width: 10px; height: 10px;
+  inset: auto;
   border-radius: 3px;
-  border: 1px solid var(--border);
-  margin-right: 5px;
-  vertical-align: baseline;
+  border: 2px solid var(--graph-today);
 }
-.sw-past { background: var(--primary); border-color: var(--primary); }
-.sw-present { background: linear-gradient(90deg, var(--primary) 50%, transparent 50%); border-color: var(--primary); }
-.sw-future { background: transparent; }
 
-.form { display: flex; flex-direction: column; gap: 10px; margin: 14px 0; }
-.form h3 { margin: 0; font-size: 14px; }
-.activity-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
-.activity { display: flex; flex-direction: column; gap: 6px; }
-.activity-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.badge {
-  font-size: 11px;
-  border: 1px solid var(--border);
-  background: var(--muted-bg);
-  color: var(--muted);
-  border-radius: 999px;
-  padding: 2px 8px;
-  text-transform: capitalize;
+@media (prefers-reduced-motion: no-preference) {
+  /* Three phases, and only the last one repeats. The draw-on plays once, the
+     tail collapses to a comet once, then the comet runs round forever. The loop
+     deliberately animates only `--now-angle` — if it touched `--now-arc` it
+     would wrap 90deg -> 360deg on every cycle and replay the draw-on. */
+  .now-trace {
+    animation:
+      now-trace-in 900ms cubic-bezier(0.4, 0, 0.2, 1) both,
+      now-trace-tail 320ms cubic-bezier(0.4, 0, 0.2, 1) 900ms both,
+      now-trace-loop 2.8s linear 1220ms infinite;
+  }
 }
-.notes { margin: 0; font-size: 14px; white-space: pre-wrap; }
 
-.footer { margin-top: 24px; }
+/* Draws the ring from 0% to 100% of the perimeter, start point travelling. */
+@keyframes now-trace-in {
+  from {
+    --now-angle: 0deg;
+    --now-arc: 0deg;
+  }
+  to {
+    --now-angle: 360deg;
+    --now-arc: 360deg;
+  }
+}
+
+/* Draws the full ring down to a comet, once. */
+@keyframes now-trace-tail {
+  from {
+    --now-arc: 360deg;
+  }
+  to {
+    --now-arc: 90deg;
+  }
+}
+
+/* Runs the comet around the perimeter. Arc stays put. */
+@keyframes now-trace-loop {
+  from {
+    --now-angle: 0deg;
+  }
+  to {
+    --now-angle: 360deg;
+  }
+}
+
+/*
+  Push: the add-activity form grows a track so the list below is pushed down
+  rather than jumping. Stays mounted while closed, so both directions animate.
+*/
+@media (prefers-reduced-motion: no-preference) {
+  .push {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 340ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 220ms cubic-bezier(0.4, 0, 0.2, 1),
+      margin-top 340ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .push[data-open="true"] {
+    grid-template-rows: 1fr;
+    margin-top: 1.5rem;
+    opacity: 1;
+  }
+
+  .push > * {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .push[data-open="true"] > * {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Without motion, a collapsed track must not clip the form at 0fr. */
+  .push {
+    display: block;
+  }
+
+  .push:not([data-open="true"]) {
+    display: none;
+  }
+}
